@@ -16,8 +16,6 @@ sudo apt install libfreetype6-dev
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -81,17 +79,51 @@ void main()
 }
 )";
 
-// Cube vertices with normals
+// Cube vertices with normals (full cube)
 float vertices[] = {
     // positions          // normals
+    // Back face
     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-    // other faces omitted for brevity...
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,         
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,         
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,        
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,         
+    // Front face
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,         
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,         
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,         
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,         
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,         
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,         
+    // Left face
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,         
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,         
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,         
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,         
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,         
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,         
+    // Right face
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,         
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,         
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,         
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,         
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,         
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,         
+    // Bottom face
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,         
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,         
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,         
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,         
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,         
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,         
+    // Top face
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,         
+     0.5f,  0.5f , 0.5f,  0.0f,  1.0f,  0.0f,         
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,         
+     0.5f,  0.5f , 0.5f,  0.0f,  1.0f,  0.0f,         
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,         
+    -0.5f,  0.5f , 0.5f,   0.0f,  1.0f,  0.0f          
 };
 
 // Function to compile shader
@@ -138,17 +170,14 @@ void processInput(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, true);
 }
 
-void renderText(const std::string& text, float x, float y, float scale, glm::vec3 color) {
-    // TODO: Implement text rendering with FreeType here
-    // This function will use FreeType to render the shininess values below the cubes
-}
-
 int main() {
+    // Initialize GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Create window
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL Specular Cubes", NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -157,13 +186,13 @@ int main() {
     }
     glfwMakeContextCurrent(window);
 
+    // Initialize GLEW
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
-        return -1;
-    }
+    glewInit();
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
@@ -172,67 +201,74 @@ int main() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
+    // Bind and set cube VAO and VBO
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // Normal attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-
-    // Array of shininess values to replicate the image
+    // Array of shininess values
     float shininessValues[8] = {2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 256.0f};
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
+        // Clear buffers
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Use cube shader program
         glUseProgram(shaderProgram);
 
+        // Set up camera and projection
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / HEIGHT, 0.1f, 100.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -7.0f));
+        glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)WIDTH / HEIGHT, 0.1f, 100.0f);
+        // Pass matrices to shader
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-        glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, glm::value_ptr(lightPos));
-        glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 3.0f)));
-        glUniform3fv(glGetUniformLocation(shaderProgram, "lightColor"), 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
+        // Set view position
+        glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 7.0f)));
+        // Set light color and object color
+        glUniform3fv(glGetUniformLocation(shaderProgram, "lightColor"), 1, glm::value_ptr(glm::vec3(1.0f)));
         glUniform3fv(glGetUniformLocation(shaderProgram, "objectColor"), 1, glm::value_ptr(glm::vec3(0.8f, 0.3f, 0.3f)));
 
         // Draw cubes with different shininess values
         for (int i = 0; i < 8; i++) {
-            glm::mat4 cubeModel = glm::translate(model, glm::vec3((i % 4) * 2.0f - 3.0f, (i / 4) * 2.0f - 1.0f, 0.0f));
+            // Calculate cube position
+            float spacing = 1.2f;
+            glm::vec3 position = glm::vec3((i % 4) * spacing - 1.8f, -(i / 4) * spacing + 0.6f, 0.0f);
+            glm::mat4 cubeModel = glm::translate(model, position);
+            // Rotate cube
+            cubeModel = glm::rotate(cubeModel, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            // Set model matrix
             glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(cubeModel));
+            // Set shininess
             glUniform1f(glGetUniformLocation(shaderProgram, "shininess"), shininessValues[i]);
+            // Set individual light position
+            glm::vec3 cubeLightPos = position + glm::vec3(-1.0f, 0.0f, 2.0f);
+            glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, glm::value_ptr(cubeLightPos));
+            // Draw cube
             glBindVertexArray(VAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
-
-            // Render the shininess value below each cube
-            renderText(std::to_string((int)shininessValues[i]), (i % 4) * 2.0f - 3.0f, -1.8f - (i / 4) * 2.0f, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
         }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    // Clean up resources
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 
     glfwTerminate();
     return 0;
 }
+
