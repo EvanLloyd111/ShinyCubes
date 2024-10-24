@@ -131,18 +131,6 @@ unsigned int compileShader(unsigned int type, const char* source) {
     return id;
 }
 
-// Light positions for each cube
-std::array<glm::vec3, 8> lightPositions = {{
-    glm::vec3(-3.3f, 3.0f, 2.0f),
-    glm::vec3(-1.1f, 3.0f, 2.0f),
-    glm::vec3(1.1f, 3.0f, 2.0f),
-    glm::vec3(3.3f, 3.0f, 2.0f),
-    glm::vec3(-3.3f, 0.8f, 2.0f),
-    glm::vec3(-1.1f, 0.8f, 2.0f),
-    glm::vec3(1.1f, 0.8f, 2.0f),
-    glm::vec3(3.3f, 0.8f, 2.0f)
-}};
-
 unsigned int createShaderProgram(const char* vertexSource, const char* fragmentSource) {
     unsigned int program = glCreateProgram();
     unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexSource);
@@ -231,11 +219,17 @@ int main() {
     float shininessValues[] = {2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 256.0f};
 
     // Initialize light positions for each cube
+    int j = 3;
     std::vector<glm::vec3> lightPositions;
     for (int i = 0; i < 8; i++) {
-        float x = (i % 4) * 2.2f - 2.3f; // Same x as cube
-        float y = (i / 4) * -2.2f + 1.1f; // Same y as cube
+        float x = (i % 4) * 2.2f - 2.3f - (j * 0.35); // Same x as cube
+        float y = (i / 4) * -2.8f + 1.7f; // Same y as cube
         lightPositions.push_back(glm::vec3(x, y, 2.0f)); // Position lights in front of cubes
+        if(j == 0){
+             j = 3;
+        }else{
+             j--;
+        }
     }
 
     // Render loop
@@ -243,7 +237,7 @@ int main() {
         processInput(window);
 
         // Render
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.175f, 0.175f, 0.175f, 1.0f); // Set background to light grey
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Activate shader
@@ -280,7 +274,7 @@ int main() {
         for (int i = 0; i < 8; i++) {
             // Calculate cube position
             float x = (i % 4) * 2.2f - 3.3f;
-            float y = (i / 4) * -2.2f + 1.1f;
+            float y = (i / 4) * -2.8f + 1.7f;
 
             // Set static light position for this cube
             glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, glm::value_ptr(lightPositions[i]));
