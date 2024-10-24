@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <array>
+
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -130,6 +132,19 @@ unsigned int compileShader(unsigned int type, const char* source) {
     return id;
 }
 
+
+// Light positions for each cube
+std::array<glm::vec3, 8> lightPositions = {{
+    glm::vec3(-3.3f, 3.0f, 2.0f),
+    glm::vec3(-1.1f, 3.0f, 2.0f),
+    glm::vec3(1.1f, 3.0f, 2.0f),
+    glm::vec3(3.3f, 3.0f, 2.0f),
+    glm::vec3(-3.3f, 0.8f, 2.0f),
+    glm::vec3(-1.1f, 0.8f, 2.0f),
+    glm::vec3(1.1f, 0.8f, 2.0f),
+    glm::vec3(3.3f, 0.8f, 2.0f)
+}};
+
 unsigned int createShaderProgram(const char* vertexSource, const char* fragmentSource) {
     unsigned int program = glCreateProgram();
     unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexSource);
@@ -217,8 +232,13 @@ int main() {
     // Shininess values for different cubes
     float shininessValues[] = {2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 256.0f};
 
-    // Create light source position that circles around
-    float radius = 5.0f;
+    // Initialize light positions for each cube
+    std::vector<glm::vec3> lightPositions;
+    for (int i = 0; i < 8; i++) {
+        float x = (i % 4) * 2.2f - 3.3f; // Same x as cube
+        float y = (i / 4) * -2.2f + 1.1f; // Same y as cube
+        lightPositions.push_back(glm::vec3(x, y, 2.0f)); // Position lights in front of cubes
+    }
     
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -237,35 +257,35 @@ int main() {
         
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        
-        // Fixed light position
-        glm::vec3 lightPos(3.0f, 3.0f, 5.0f);
-        glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, glm::value_ptr(lightPos));
-        glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
-        glUniform3f(glGetUniformLocation(shaderProgram, "objectColor"), 1.0f, 0.5f, 0.31f);
 
         // Camera position
         glm::vec3 viewPos(0.0f, 0.0f, 3.0f);
         glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, glm::value_ptr(viewPos));
 
+        // Set common light properties
+        glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram, "objectColor"), 1.0f, 0.5f, 0.31f);
+
         // Render cubes
         glBindVertexArray(VAO);
         for (int i = 0; i < 8; i++) {
-            // Calculate position
-            float x = (i % 4) * 2.2f - 3.3f; 
-            float y = (i / 4) * -2.2f + 1.1f;  
-        // Model transformation
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(x, y, 0.0f));
-        // Add rotation 
-        model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));  // Add this line
-        model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));            
+            // Calculate cube position
+            float x = (i % 4) * 2.2f - 3.3f;
+            float y = (i / 4) * -2.2f + 1.1f;
             
-            glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, 
-                             glm::value_ptr(model));
+            // Set static light position for this cube
+            glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, glm::value_ptr(lightPositions[i]));
             
-            // Set different shininess for each cube
+            // Set shininess for this cube
             glUniform1f(glGetUniformLocation(shaderProgram, "shininess"), shininessValues[i]);
+
+            // Model transformation
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(x, y, 0.0f));
+            model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
+            
+            glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
             
             // Draw cube
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -284,4 +304,3 @@ int main() {
     glfwTerminate();
     return 0;
 }
-        
