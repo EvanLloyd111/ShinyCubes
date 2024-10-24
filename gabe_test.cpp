@@ -235,7 +235,7 @@ int main() {
     // Initialize light positions for each cube
     std::vector<glm::vec3> lightPositions;
     for (int i = 0; i < 8; i++) {
-        float x = (i % 4) * 2.2f - 3.3f; // Same x as cube
+        float x = (i % 4) * 2.2f - 2.3f; // Same x as cube
         float y = (i / 4) * -2.2f + 1.1f; // Same y as cube
         lightPositions.push_back(glm::vec3(x, y, 2.0f)); // Position lights in front of cubes
     }
@@ -282,7 +282,7 @@ int main() {
             // Model transformation
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(x, y, 0.0f));
-            model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(9.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
             
             glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
